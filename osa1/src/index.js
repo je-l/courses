@@ -1,45 +1,79 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Statistics from './component/Statistics';
-import Button from './component/Button';
+import Anecdote from './Anecdote';
+
+// exclusive upper bound
+const randint = max => Math.floor(Math.random() * max);
 
 class App extends React.Component {
   state = {
-    goodVotes: 0,
-    neutralVotes: 0,
-    badVotes: 0,
-  }
+    selected: 0,
+    anecdotes: this.props.anecdotes,
+  };
 
-  incrementVote = vote => () => {
-    this.setState(prev => ({ [vote]: prev[vote] + 1 }));
+  changeAnecdote = () => (
+    this.setState({
+      selected: randint(this.props.anecdotes.length),
+    })
+  )
+
+  voteAnecdote = () => {
+    const { selected, anecdotes } = this.state;
+
+    anecdotes[selected].votes += 1;
+
+    this.setState({
+      anecdotes,
+    });
   }
 
   render() {
-    const { goodVotes, neutralVotes, badVotes } = this.state;
+    const { anecdotes } = this.props;
 
-    const hasVotes = goodVotes || neutralVotes || badVotes;
+    const selection = anecdotes[this.state.selected];
+
+    const winner = anecdotes.reduce((most, current) => (
+      current.votes > most.votes ? current : most
+    ));
 
     return (
       <div>
-        <h2>anna palautetta</h2>
-        <Button onClick={this.incrementVote('goodVotes')}>hyvä</Button>
-        <Button onClick={this.incrementVote('neutralVotes')}>neutraali</Button>
-        <Button onClick={this.incrementVote('badVotes')}>huono</Button>
-        {hasVotes ? (
-          <Statistics
-            goodVotes={goodVotes}
-            neutralVotes={neutralVotes}
-            badVotes={badVotes}
-          />
-        ) : <p>ei yhtään palautetta annettu</p>}
+        <Anecdote contents={selection.content} votes={selection.votes} />
+
+        <section>
+          <button onClick={this.changeAnecdote}>seuraava anekdootti</button>
+          <button onClick={this.voteAnecdote}>äänestä</button>
+        </section>
+
+        <h2>eniten ääniä:</h2>
+        <Anecdote contents={winner.content} votes={winner.votes} />
 
       </div>
     );
   }
 }
 
+const anecdotes = [
+  'If it hurts, do it more often',
+
+  'Adding manpower to a late software project makes it later!',
+
+  'The first 90 percent of the code accounts for the first 90 percent of the ' +
+  'development time...The remaining 10 percent of the code accounts for the ' +
+  'other 90 percent of the development time.',
+
+  'Any fool can write code that a computer can understand. Good programmers ' +
+  'write code that humans can understand.',
+
+  'Premature optimization is the root of all evil.',
+
+  'Debugging is twice as hard as writing the code in the first place. ' +
+  'Therefore, if you write the code as cleverly as possible, you are, by ' +
+  'definition, not smart enough to debug it.',
+];
+
 ReactDOM.render(
-  <App />,
+  <App anecdotes={anecdotes.map(a => ({ content: a, votes: 0 }))} />,
   document.getElementById('root'),
 );
