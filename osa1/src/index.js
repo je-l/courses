@@ -1,36 +1,43 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Otsikko from './component/Otsikko';
-import Sisalto from './component/Sisalto';
-import Yhteensa from './component/Yhteensa';
+import Statistics from './component/Statistics';
+import Button from './component/Button';
 
+class App extends React.Component {
+  state = {
+    goodVotes: 0,
+    neutralVotes: 0,
+    badVotes: 0,
+  }
 
-const kurssi = {
-  nimi: 'Half Stack -sovelluskehitys',
-  osat: [
-    {
-      nimi: 'Reactin perusteet',
-      tehtavia: 10,
-    },
-    {
-      nimi: 'Tiedonvälitys propseilla',
-      tehtavia: 7,
-    },
-    {
-      nimi: 'Komponenttien tila',
-      tehtavia: 14,
-    },
-  ],
-};
+  incrementVote = vote => () => {
+    this.setState(prev => ({ [vote]: prev[vote] + 1 }));
+  }
 
-const App = () => (
-  <div>
-    <Otsikko kurssi={kurssi.nimi} />
-    <Sisalto osat={kurssi.osat} />
-    <Yhteensa osat={kurssi.osat} />
-  </div>
-);
+  render() {
+    const { goodVotes, neutralVotes, badVotes } = this.state;
+
+    const hasVotes = goodVotes || neutralVotes || badVotes;
+
+    return (
+      <div>
+        <h2>anna palautetta</h2>
+        <Button onClick={this.incrementVote('goodVotes')}>hyvä</Button>
+        <Button onClick={this.incrementVote('neutralVotes')}>neutraali</Button>
+        <Button onClick={this.incrementVote('badVotes')}>huono</Button>
+        {hasVotes ? (
+          <Statistics
+            goodVotes={goodVotes}
+            neutralVotes={neutralVotes}
+            badVotes={badVotes}
+          />
+        ) : <p>ei yhtään palautetta annettu</p>}
+
+      </div>
+    );
+  }
+}
 
 ReactDOM.render(
   <App />,
