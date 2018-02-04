@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import axios from 'axios';
 
 import Persons from './component/Persons';
 import PersonForm from './component/PersonForm';
+import Notification from './component/Notification';
 
-const API_URL = 'http://localhost:3001';
+import personService from './service/person';
+
 
 class App extends React.Component {
   state = {
@@ -13,25 +14,66 @@ class App extends React.Component {
     filter: '',
     newName: '',
     newNumber: '',
+    notification: null,
   };
 
-  async componentWillMount() {
-    const { data } = await axios.get(`${API_URL}/persons`);
-
-    this.setState({ persons: data });
+  componentWillMount() {
+    this.fetchPersons();
   }
 
-  onAddNew = (event) => {
+  onAddNew = async (event) => {
     event.preventDefault();
 
     const { persons, newName, newNumber } = this.state;
 
-    if (persons.map(p => p.name).includes(newName)) {
-      return;
+    const previousPerson = persons.find(p => p.name === newName);
+
+    const newId = Math.max(...persons.map(p => p.id)) + 1;
+    const newPerson = { name: newName, number: newNumber, id: newId };
+
+    if (previousPerson) {
+      if (window.confirm(newPerson.name + ' on jo luettelossa, korvataanko numero?')) {  // eslint-disable-line
+        try {
+          await personService.update(previousPerson.id, newPerson);
+          this.showNotification(`muutettiin nroa henkilölle ${newPerson.name}`);
+        } catch (err) {
+          console.error(err);
+          this.showNotification('muutos epäonnistui');
+        }
+      }
+      // do nothing if canceled confirm
+    } else {
+      await personService.create(newPerson);
+      this.showNotification(`lisättiin ${newPerson.name}`);
     }
 
-    const newPersons = [...persons, { name: newName, number: newNumber }];
-    this.setState({ persons: newPersons, newName: '', newNumber: '' });
+    await this.fetchPersons();
+  }
+
+  onRemovePerson = async person => {
+    if (!window.confirm('poistetaanko ' + person.name)) return;  // eslint-disable-line
+
+    await personService.deleteOne(person.id);
+
+    this.showNotification(`poistettiin ${person.name}`);
+
+    this.setState(prevState => ({
+      persons: prevState.persons.filter(p => p.id !== person.id),
+    }));
+  }
+
+  showNotification = text => {
+    this.setState({ notification: text });
+
+    setTimeout(() => {
+      this.setState({ notification: null });
+    }, 5000);
+  }
+
+  fetchPersons = async () => {
+    this.setState({ persons: null });
+    const { data } = await personService.getAll();
+    this.setState({ persons: data });
   }
 
   render() {
@@ -40,11 +82,13 @@ class App extends React.Component {
       newName,
       newNumber,
       filter,
+      notification,
     } = this.state;
 
     return (
       <div>
         <h2>Puhelinluettelo</h2>
+        {notification && <Notification>{notification}</Notification>}
         <div>
           rajaa näytettäviä
           <input
@@ -59,7 +103,11 @@ class App extends React.Component {
           onNumberChange={e => this.setState({ newNumber: e.target.value })}
           addNew={this.onAddNew}
         />
-        <Persons filter={filter} persons={persons} />
+        <Persons
+          filter={filter}
+          persons={persons}
+          onRemovePerson={this.onRemovePerson}
+        />
       </div>
     );
   }
