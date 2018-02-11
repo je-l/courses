@@ -12,5 +12,6 @@ module.exports = {
         "react/prop-types": 0,
         "max-len": [2, 80],
         "arrow-parens": 0,
+        "no-console": 0,
     },
 };

@@ -28,8 +28,7 @@ class App extends React.Component {
 
     const previousPerson = persons.find(p => p.name === newName);
 
-    const newId = Math.max(...persons.map(p => p.id)) + 1;
-    const newPerson = { name: newName, number: newNumber, id: newId };
+    const newPerson = { name: newName, number: newNumber };
 
     if (previousPerson) {
       if (window.confirm(newPerson.name + ' on jo luettelossa, korvataanko numero?')) {  // eslint-disable-line
@@ -43,7 +42,14 @@ class App extends React.Component {
       }
       // do nothing if canceled confirm
     } else {
-      await personService.create(newPerson);
+      try {
+        await personService.create(newPerson);
+      } catch (e) {
+        console.error(e);
+        this.showNotification(e.response.data.error);
+        return;
+      }
+
       this.showNotification(`lisättiin ${newPerson.name}`);
     }
 
@@ -52,7 +58,6 @@ class App extends React.Component {
 
   onRemovePerson = async person => {
     if (!window.confirm('poistetaanko ' + person.name)) return;  // eslint-disable-line
-
     await personService.deleteOne(person.id);
 
     this.showNotification(`poistettiin ${person.name}`);
