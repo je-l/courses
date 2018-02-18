@@ -11,5 +11,6 @@ module.exports = {
         "max-len": [2, 80],
         "arrow-body-style": 0,
         "arrow-parens": 0,
+        "no-underscore-dangle": 0,
     }
 };

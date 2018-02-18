@@ -18,7 +18,8 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-jest": "^21.12.1",
     "jest": "^22.3.0",
-    "nodemon": "^1.14.12"
+    "nodemon": "^1.14.12",
+    "supertest": "^3.0.0"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
