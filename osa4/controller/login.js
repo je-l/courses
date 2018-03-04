@@ -18,6 +18,11 @@ router.post('/', async (req, res) => {
     hash, username, name, _id,
   } = await User.findOne({ username: reqUsername }) || {};
 
+  if (!username) {
+    res.status(404).send({ error: 'user not found' });
+    return;
+  }
+
   const passwordCorrect = await bcrypt.compare(reqPassword, hash);
 
   if (!passwordCorrect) {
