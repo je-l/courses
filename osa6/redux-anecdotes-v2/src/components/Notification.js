@@ -1,18 +1,18 @@
-import React from 'react'
+import React from 'react';
+import { connect } from 'react-redux';
 
-class Notification extends React.Component {
-  render() {
-    const style = {
-      border: 'solid',
-      padding: 10,
-      borderWidth: 1
-    }
-    return (
-      <div style={style}>
-        render here notification...
-      </div>
-    )
-  }
-}
+const Notification = ({ text }) => {
+  const style = {
+    border: 'solid',
+    padding: 10,
+    borderWidth: 1,
+  };
 
-export default Notification
+  return text ? <div style={style}>{text}</div> : null;
+};
+
+const mapStateToProps = state => ({
+  text: state.notification,
+});
+
+export default connect(mapStateToProps)(Notification);

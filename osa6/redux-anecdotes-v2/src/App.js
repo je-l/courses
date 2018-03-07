@@ -1,21 +1,37 @@
-import React from 'react'
-import Notification from './components/Notification'
-import AnecdoteForm from './components/AnecdoteForm'
-import AnecdoteList from './components/AnecdoteList'
+import React from 'react';
+import { connect } from 'react-redux';
+import { fetchAnecdotes } from './reducers/anecdoteReducer';
+import Notification from './components/Notification';
+import AnecdoteForm from './components/AnecdoteForm';
+import AnecdoteList from './components/AnecdoteList';
 
 class App extends React.Component {
+  componentDidMount() {
+    this.props.dispatch(fetchAnecdotes());
+  }
 
   render() {
-    const anecdotes = this.props.store.getState()
     return (
       <div>
         <h1>Programming anecdotes</h1>
         <Notification />
-        <AnecdoteList store={this.props.store} />
-        <AnecdoteForm store={this.props.store} />
+        <AnecdoteList anecdotes={this.props.anecdotes} />
+        <AnecdoteForm />
       </div>
-    )
+    );
   }
 }
 
-export default App
+const mapStateToProps = state => {
+  const { anecdotes, filter } = state;
+
+  const filtered = anecdotes
+    .filter(a => a.content.toLowerCase().includes(filter))
+    .sort((a, b) => b.votes - a.votes);
+
+  return {
+    anecdotes: filtered,
+  };
+};
+
+export default connect(mapStateToProps)(App);
