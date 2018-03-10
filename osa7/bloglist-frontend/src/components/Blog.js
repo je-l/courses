@@ -5,11 +5,10 @@ const ButtonText = styled.span`
   cursor: pointer;
 `;
 
-const Blog = ({ blog, isOpen, onChoose, onDelete, voteBlog, byThisUser }) => (
+const Blog = ({ blog, isOpen, onChoose, onDelete, likeBlog, byThisUser }) => (
   <Fragment>
     <dt>
-      <ButtonText onClick={() => onChoose()}>{blog.title}</ButtonText>{' '}
-      {blog.author}
+      <ButtonText onClick={onChoose}>{blog.title}</ButtonText> {blog.author}
     </dt>
     {isOpen && (
       <Fragment>
@@ -18,7 +17,7 @@ const Blog = ({ blog, isOpen, onChoose, onDelete, voteBlog, byThisUser }) => (
         </dd>
         <dd>
           {blog.likes} likes
-          <button onClick={() => voteBlog()}>like</button>
+          <button onClick={likeBlog}>like</button>
         </dd>
         <dd>added by {blog.author}</dd>
         {byThisUser && (

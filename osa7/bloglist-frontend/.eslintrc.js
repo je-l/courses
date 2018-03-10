@@ -30,6 +30,7 @@ module.exports = {
         "arrow-parens": 0,
         "jsx-a11y/href-no-hash": "off",
         "react/prop-types": 0,
+        "no-case-declarations": 0,
         "import/no-extraneous-dependencies": 0,
         "no-underscore-dangle": 0,
         "prettier/prettier": ["error", {

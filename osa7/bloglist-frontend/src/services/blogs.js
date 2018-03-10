@@ -6,7 +6,7 @@ const decodeLocalStorage = item => {
   return JSON.parse(window.localStorage.getItem(item));
 };
 
-const getAll = () => {
+export const getAll = () => {
   const request = axios.get(baseUrl);
   return request.then(response => response.data);
 };
@@ -29,11 +29,9 @@ export const deleteBlog = id => {
   });
 };
 
-export const voteBlog = blog => {
+export const likeBlog = blog => {
   return axios.patch(`${baseUrl}/${blog._id}`, {
     ...blog,
     likes: blog.likes + 1,
   });
 };
-
-export default { getAll };

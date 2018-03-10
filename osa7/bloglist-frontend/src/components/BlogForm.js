@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import { connect } from 'react-redux';
 
-import { createBlog } from '../services/blogs';
+import { createBlogAction } from '../app.duck';
 
 const Wrapper = styled.div`
   margin: 10px 0;
@@ -17,17 +18,7 @@ class BlogForm extends React.Component {
   onCreate = e => {
     e.preventDefault();
     const { title, url, author } = this.state;
-    const { displayNotification } = this.props;
-
-    createBlog(title, { author, url })
-      .then(() => {
-        displayNotification(`a new blog '${title}' by ${author} added`);
-        this.props.syncBlogs();
-      })
-      .catch(err => {
-        displayNotification(`failed to add blog: ${err}`, { error: true });
-        console.error(err);
-      });
+    this.props.dispatch(createBlogAction(title, { url, author }));
   };
 
   updateField = field => e => {
@@ -60,4 +51,4 @@ class BlogForm extends React.Component {
   }
 }
 
-export default BlogForm;
+export default connect()(BlogForm);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import App from './App';
+import App from '../src/App';
 
 jest.mock('./services/blogs');
 jest.mock('./services/authService');
@@ -27,13 +27,7 @@ describe('<App />', () => {
   let app;
 
   beforeAll(() => {
-    app = withRenderWait(
-      mount(
-        <div>
-          <App />
-        </div>,
-      ),
-    );
+    app = withRenderWait(mount(<App />));
   });
 
   it('should display login form if user is not logged in', () => {
