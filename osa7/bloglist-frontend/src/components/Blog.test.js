@@ -1,8 +1,16 @@
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import { shallow } from 'enzyme';
-import Blog from './Blog';
+import { Blog as NonRoutedBlog } from './Blog';
+
+const Blog = ({ children, ...rest }) => (
+  <MemoryRouter>
+    <NonRoutedBlog {...rest}>{children}</NonRoutedBlog>
+  </MemoryRouter>
+);
 
 const exampleBlog = {
+  _id: 'abc',
   url: 'http://example.com',
   title: 'Introduction to blogging I',
   author: 'Matti Meikäläinen',
@@ -19,9 +27,10 @@ describe('<Blog />', () => {
     expect(html).not.toContain(exampleBlog.likes);
   });
 
-  it('should show likes when opened', () => {
-    const wrapper = shallow(<Blog blog={exampleBlog} isOpen />);
+  it('should offer link to invidual blog view', () => {
+    const wrapper = shallow(<Blog blog={exampleBlog} />);
+    wrapper.update();
 
-    expect(wrapper.html()).toContain(exampleBlog.likes);
+    expect(wrapper.html()).toContain('href="/blogs/abc"');
   });
 });

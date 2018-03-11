@@ -1,33 +1,16 @@
-import React, { Fragment } from 'react';
-import styled from 'styled-components';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 
-const ButtonText = styled.span`
-  cursor: pointer;
-`;
-
-const Blog = ({ blog, isOpen, onChoose, onDelete, likeBlog, byThisUser }) => (
-  <Fragment>
-    <dt>
-      <ButtonText onClick={onChoose}>{blog.title}</ButtonText> {blog.author}
-    </dt>
-    {isOpen && (
-      <Fragment>
-        <dd>
-          <a href={blog.url}>{blog.url}</a>
-        </dd>
-        <dd>
-          {blog.likes} likes
-          <button onClick={likeBlog}>like</button>
-        </dd>
-        <dd>added by {blog.author}</dd>
-        {byThisUser && (
-          <dd>
-            <button onClick={onDelete}>delete</button>
-          </dd>
-        )}
-      </Fragment>
-    )}
-  </Fragment>
+export const Blog = ({ blog }) => (
+  <div>
+    <Link className="blog-link" to={`/blogs/${blog._id}`}>
+      {blog.title} {blog.author}
+    </Link>
+  </div>
 );
 
-export default Blog;
+export default connect(({ selection, username }, props) => ({
+  isOpen: selection === props.blog._id,
+  byThisUser: props.blog.username ? props.blog.username === username : true,
+}))(Blog);

@@ -6,6 +6,8 @@ import {
   getAll as getAllBlogs,
 } from './services/blogs';
 
+import getAllUsers from './services/users';
+
 const NOTIFICATION_SHOW = 'notification/SHOW';
 const NOTIFICATION_HIDE = 'notification/HIDE';
 
@@ -23,6 +25,8 @@ const BLOG_DESELECT = 'blog/DESELECT';
 const BLOG_LIKE = 'blog/LIKE';
 const BLOG_DELETE = 'blog/DELETE';
 
+const FETCH_USERS = 'user/FETCH';
+
 export const createLoadingStart = () => ({
   type: LOADING_START,
 });
@@ -39,6 +43,17 @@ export const selectBlog = _id => ({
 export const deselectBlog = () => ({
   type: BLOG_DESELECT,
 });
+
+export const fetchUsers = () => dispatch => {
+  dispatch(createLoadingStart());
+
+  getAllUsers()
+    .then(users => {
+      dispatch({ type: FETCH_USERS, users });
+      dispatch(createLoadingEnd());
+    })
+    .catch(() => dispatch(createLoadingEnd()));
+};
 
 export const fetchBlogs = () => dispatch => {
   dispatch(createLoadingStart());
@@ -124,7 +139,8 @@ const initialState = {
   notificationText: null,
   notificationError: null,
   loading: false,
-  blogs: [],
+  blogs: null,
+  users: null,
   selection: null,
   ...JSON.parse(window.localStorage.getItem('token')),
 };
@@ -175,6 +191,8 @@ export default (store = initialState, action) => {
           return blog._id !== action._id;
         }),
       };
+    case FETCH_USERS:
+      return { ...store, users: action.users };
     default:
       return store;
   }

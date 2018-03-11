@@ -1,49 +1,60 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
-const LoginForm = ({
-  openLoginForm,
-  closeLoginForm,
-  isOpen,
-  username,
-  password,
-  updateInput,
-  onLogin,
-}) =>
-  isOpen ? (
-    <Fragment>
-      <h2>log in to application</h2>
-      <form>
-        <div>
-          username
-          <input value={username} onChange={updateInput('usernameValue')} />
-        </div>
-        <div>
-          password
-          <input value={password} onChange={updateInput('passwordValue')} />
-        </div>
-        <div>
-          <button className="login-btn" onClick={onLogin}>
-            login
-          </button>
-        </div>
-        <div>
-          <button onClick={closeLoginForm}>cancel</button>
-        </div>
-      </form>
-    </Fragment>
-  ) : (
-    <button onClick={openLoginForm}>log in</button>
-  );
+import { fetchUserToken } from '../app.duck';
 
-LoginForm.propTypes = {
-  openLoginForm: PropTypes.func.isRequired,
-  closeLoginForm: PropTypes.func.isRequired,
-  isOpen: PropTypes.bool.isRequired,
-  username: PropTypes.string.isRequired,
-  password: PropTypes.string.isRequired,
-  updateInput: PropTypes.func.isRequired,
-  onLogin: PropTypes.func.isRequired,
-};
+class LoginForm extends React.Component {
+  state = {
+    username: 'testuser',
+    password: 'pass123',
+    isOpen: true,
+  };
 
-export default LoginForm;
+  updateInput = field => ({ target: { value } }) => {
+    this.setState({ [field]: value });
+  };
+
+  onLogin = e => {
+    e.preventDefault();
+    const { username, password } = this.state;
+
+    this.props.dispatch(fetchUserToken(username, password));
+  };
+
+  onCancel = e => {
+    e.preventDefault();
+    this.setState({ isOpen: false });
+  };
+
+  render() {
+    const { username, password, isOpen } = this.state;
+
+    return isOpen ? (
+      <Fragment>
+        <h2>log in to application</h2>
+        <form>
+          <div>
+            username
+            <input value={username} onChange={this.updateInput('username')} />
+          </div>
+          <div>
+            password
+            <input value={password} onChange={this.updateInput('password')} />
+          </div>
+          <div>
+            <button className="login-btn" onClick={this.onLogin}>
+              login
+            </button>
+          </div>
+          <div>
+            <button onClick={this.onCancel}>cancel</button>
+          </div>
+        </form>
+      </Fragment>
+    ) : (
+      <button onClick={() => this.setState({ isOpen: true })}>log in</button>
+    );
+  }
+}
+
+export default connect()(LoginForm);
